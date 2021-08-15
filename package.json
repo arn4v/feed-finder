@@ -1,19 +1,11 @@
 {
-  "name": "feed-finder",
-  "version": "0.2.1",
+  "name": "feed-finder2",
+  "license": "MIT",
+  "version": "0.1.0",
   "description": "Stubborn feed auto discovery tool",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "postversion": "git push && git push --tags"
-  },
-  "engines": {
-    "node": ">=0.10.0"
-  },
-  "bin": "./bin/feed-finder.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/cakuki/feed-finder.git"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "rss",
@@ -21,14 +13,13 @@
     "atom",
     "xml"
   ],
-  "author": "Can Kutlu Kınay <me@ckk.im>",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/cakuki/feed-finder/issues"
-  },
-  "homepage": "https://github.com/cakuki/feed-finder#readme",
+  "author": "Arnav Gosain <arnav@arnavgosain.com>",
+  "authors": [
+    "Can Kutlu Kınay <me@ckk.im>"
+  ],
   "dependencies": {
-    "got": "^5.7.1",
-    "htmlparser2": "^3.9.0"
+    "fetch-retry": "^4.1.1",
+    "htmlparser2": "^6.1.0",
+    "node-fetch": "^2.6.1"
   }
 }

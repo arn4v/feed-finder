@@ -6,11 +6,11 @@ if (/^v0\.10\.[0-9]+$/.test(process.version)) {
     require('https').globalAgent.maxSockets = Infinity;
 }
 
-var args = process.argv.slice(2);
-var input = args.filter(function (arg) {
+let args = process.argv.slice(2);
+let input = args.filter(function (arg) {
     return arg.indexOf('-') != 0;
 })[0];
-var flags = args.filter(function (arg) {
+let flags = args.filter(function (arg) {
     return arg.indexOf('--') == 0;
 }).map(function (arg) {
     return arg.replace(/^\-\-/, '');
@@ -20,9 +20,9 @@ if (!input) {
     fail('Please provide url for searching feeds.');
 }
 
-var feedFinder = require('../');
+let feedFinder = require('../');
 
-var options = {};
+let options = {};
 if (flags.indexOf('no-www-switch') > -1) {
     options.noWWWSwitch = true;
 }

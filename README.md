@@ -67,7 +67,7 @@ Disables www switch. By default feed-finder adds missing www and looks for that 
 ### API
 
 ```js
-var feedFinder = require('feed-finder'),
+let feedFinder = require('feed-finder'),
     feedRead = require('feed-read');
 
 feedFinder('mashable.com', function (err, feedUrls) {
