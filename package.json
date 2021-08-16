@@ -1,11 +1,15 @@
 {
-  "name": "feed-finder2",
-  "license": "MIT",
+  "name": "@arn4v/feed-finder",
+  "license": "ISC",
   "version": "0.1.0",
   "description": "Stubborn feed auto discovery tool",
-  "main": "index.js",
+  "source": "src/index.ts",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prebuild": "rimraf ./dist",
+    "build": "microbundle --target node --format cjs --no-sourcemap",
+    "predev": "rimraf ./dist",
+    "dev": "microbundle watch --target node --format cjs --no-sourcemap"
   },
   "keywords": [
     "rss",
@@ -13,13 +17,28 @@
     "atom",
     "xml"
   ],
+  "files": [
+    "dist"
+  ],
   "author": "Arnav Gosain <arnav@arnavgosain.com>",
-  "authors": [
+  "contributors": [
     "Can Kutlu Kınay <me@ckk.im>"
   ],
   "dependencies": {
-    "fetch-retry": "^4.1.1",
+    "got": "^11.8.2",
     "htmlparser2": "^6.1.0",
     "node-fetch": "^2.6.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arn4v/feed-finder.git"
+  },
+  "bugs": {
+    "url": "https://github.com/arn4v/feed-finder/issues"
+  },
+  "homepage": "https://github.com/arn4v/feed-finder#readme",
+  "devDependencies": {
+    "microbundle": "^0.13.3",
+    "rimraf": "^3.0.2"
   }
 }

@@ -1,18 +1,11 @@
-"use strict";
-const parser = require("./parser");
-const url = require("url");
+import parser from "./parser";
+import url, { URL } from "url";
 
-/**
- * @param {Array<unknown>} arr
- */
-const dedupe = (arr) => {
-  return [...new Set(arr)];
+const dedupe = <T = unknown>(arr: Array<T>) => {
+  return Array.from(new Set(arr));
 };
 
-/**
- * @param {Array<Array<unknown>>} arrays
- */
-const flatten = (arrays) => {
+const flatten = <T = unknown>(arrays: Array<T>) => {
   return Array.prototype.concat.apply([], arrays);
 };
 
@@ -29,15 +22,24 @@ const knownFeedEndpoints = [
   "/services/rss/",
 ];
 
-function populateWithKnownFeedEndpoints(inputUrl) {
-  if (!inputUrl) return;
-  inputUrl = url.parse(inputUrl);
+function populateWithKnownFeedEndpoints(inputUrl: string): string[] {
   return knownFeedEndpoints.map(function (endpoint) {
-    return inputUrl.resolve(endpoint);
+    return new URL(endpoint, inputUrl).toString();
   });
 }
 
-function spider(inputUrl, options) {
+function spider(inputUrl: string | string[]) {
+  // If inputUrl is an array, flatten it
+  if (Array.isArray(inputUrl)) {
+    return dedupe(
+      flatten(
+        inputUrl.map((url) => {
+          return spider(url);
+        })
+      )
+    );
+  }
+
   // If inputUrl starts with "feed:", we should not spider it.
   if (inputUrl.indexOf("feed:") === 0) {
     return [inputUrl.replace("feed:", "")];
@@ -53,28 +55,19 @@ function spider(inputUrl, options) {
     inputUrl = populateDomains(inputUrl);
   }
 
-  // If inputUrl is an array, flatten it
-  if (Array.isArray(inputUrl)) {
-    return dedupe(
-      flatten(
-        inputUrl.map((url) => {
-          return spider(url, options);
-        })
-      )
-    );
-  }
+  let _inputUrl = inputUrl as string;
 
-  let alternativeUrl;
-  if (/\bwww\./.test(inputUrl)) {
-    alternativeUrl = inputUrl.replace(/\bwww\./, "");
+  let alternativeUrl: string;
+  if (/\bwww\./.test(_inputUrl)) {
+    alternativeUrl = _inputUrl.replace(/\bwww\./, "");
   } else {
-    alternativeUrl = inputUrl.replace(/:\/\//, "://www.");
+    alternativeUrl = _inputUrl.replace(/:\/\//, "://www.");
   }
 
   const urls = [inputUrl, alternativeUrl];
 
   urls.push(
-    populateWithKnownFeedEndpoints(inputUrl),
+    populateWithKnownFeedEndpoints(_inputUrl),
     populateWithKnownFeedEndpoints(alternativeUrl)
   );
 
@@ -82,19 +75,15 @@ function spider(inputUrl, options) {
 }
 
 // Popuate a URL with likely TLDs
-function populateDomains(key) {
+function populateDomains(key: string) {
   return ["com", "net", "org", "co.uk", "co", "io"].map((ext) => {
     return key + "." + ext;
   });
 }
 
-async function finder(inputUrl, options) {
-  const urls = spider(inputUrl, options);
+async function finder(inputUrl: string) {
+  const urls = spider(inputUrl);
   return dedupe(flatten(await Promise.all(urls.map((url) => parser(url)))));
 }
 
-finder("arnavgosain").then((res) => {
-  console.log(res);
-});
-
-module.exports = finder;
+export default finder;

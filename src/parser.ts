@@ -1,7 +1,7 @@
-const HTMLParser = require("htmlparser2");
-const path = require("path");
-const request = require("./request");
-const url = require("url");
+import HTMLParser from "htmlparser2";
+import path from "path";
+import request from "./request";
+import url from "url";
 
 const contentTypes = [
   "application/x.atom+xml",
@@ -12,12 +12,12 @@ const contentTypes = [
   "application/rdf+xml",
 ];
 
-async function parser(url) {
+export default async function parser(url: string) {
   let rv = [];
   try {
     const response = await request(url);
-    if (response.status === 200) {
-      const data = await response.text();
+    if (response.statusCode === 200) {
+      const data = response.body;
       let base = null;
 
       if (response.url) {
@@ -60,9 +60,8 @@ async function parser(url) {
         _htmlParser.parseComplete(data);
       });
     }
-  } finally {
-    return rv;
-  }
+  } catch {}
+  return rv;
 }
 
 function isFeedLink(originUrl, base, tagName, attrs) {
@@ -96,5 +95,3 @@ function isPossiblyFeed(originUrl, base, tagName, attrs) {
     return url.resolve(originUrl, base ? path.join(base, href) : href);
   }
 }
-
-module.exports = exports = parser;
