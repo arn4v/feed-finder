@@ -5,6 +5,7 @@
   "description": "Stubborn feed auto discovery tool",
   "source": "src/index.ts",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "prebuild": "rimraf ./dist",
     "build": "microbundle --target node --format cjs --no-sourcemap",
