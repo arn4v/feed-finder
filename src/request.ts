@@ -1,9 +1,10 @@
 import got from "got";
+import { Options } from "./types";
 
-const request = async (url) => {
+const request = async (url: string, options?: Options) => {
   return await got(url, {
-    timeout: 1000,
-    retry: 2,
+    timeout: options.timeout ?? 1000,
+    retry: options.retryCount ?? 2,
   });
 };
 

@@ -1,5 +1,6 @@
+import { URL } from "url";
 import parser from "./parser";
-import url, { URL } from "url";
+import { Options } from "./types";
 
 const dedupe = <T = unknown>(arr: Array<T>) => {
   return Array.from(new Set(arr));
@@ -28,31 +29,21 @@ function populateWithKnownFeedEndpoints(inputUrl: string): string[] {
   });
 }
 
-function spider(inputUrl: string | string[]) {
+function spider(inputUrl: string | string[], options: Options) {
   // If inputUrl is an array, flatten it
   if (Array.isArray(inputUrl)) {
     return dedupe(
       flatten(
         inputUrl.map((url) => {
-          return spider(url);
+          return spider(url, options);
         })
       )
     );
   }
 
-  // If inputUrl starts with "feed:", we should not spider it.
-  if (inputUrl.indexOf("feed:") === 0) {
-    return [inputUrl.replace("feed:", "")];
-  }
-
   // If inputUrl has no scheme, assume http
-  if (inputUrl.indexOf("http") !== 0) {
+  if (inputUrl.indexOf("http") === -1) {
     inputUrl = "http://" + inputUrl;
-  }
-
-  // If URL has no TLD, add likely options
-  if (inputUrl.indexOf(".") == -1) {
-    inputUrl = populateDomains(inputUrl);
   }
 
   let _inputUrl = inputUrl as string;
@@ -64,12 +55,16 @@ function spider(inputUrl: string | string[]) {
     alternativeUrl = _inputUrl.replace(/:\/\//, "://www.");
   }
 
-  const urls = [inputUrl, alternativeUrl];
+  // If URL has no TLD, add likely options
+  if (inputUrl.indexOf(".") == -1) {
+    inputUrl = populateDomains(_inputUrl);
+  }
 
-  urls.push(
-    populateWithKnownFeedEndpoints(_inputUrl),
-    populateWithKnownFeedEndpoints(alternativeUrl)
-  );
+  const urls = [
+    ...(Array.isArray(inputUrl) ? inputUrl : [inputUrl]),
+    ...populateWithKnownFeedEndpoints(_inputUrl),
+    ...populateWithKnownFeedEndpoints(alternativeUrl),
+  ];
 
   return dedupe(flatten(urls).filter((url) => !!url));
 }
@@ -81,9 +76,15 @@ function populateDomains(key: string) {
   });
 }
 
-async function finder(inputUrl: string) {
-  const urls = spider(inputUrl);
-  return dedupe(flatten(await Promise.all(urls.map((url) => parser(url)))));
+async function finder(
+  inputUrl: string,
+  options: Options = {}
+): Promise<string[]> {
+  const urls = spider(inputUrl, options);
+  console.log(urls);
+  return dedupe(
+    flatten(await Promise.all(urls.map((url) => parser(url, options))))
+  );
 }
 
 export default finder;

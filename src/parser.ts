@@ -2,6 +2,7 @@ import HTMLParser from "htmlparser2";
 import path from "path";
 import request from "./request";
 import url from "url";
+import { Options } from "./types";
 
 const contentTypes = [
   "application/x.atom+xml",
@@ -12,10 +13,10 @@ const contentTypes = [
   "application/rdf+xml",
 ];
 
-export default async function parser(url: string) {
+export default async function parser(url: string, options: Options) {
   let rv = [];
   try {
-    const response = await request(url);
+    const response = await request(url, options);
     if (response.statusCode === 200) {
       const data = response.body;
       let base = null;
